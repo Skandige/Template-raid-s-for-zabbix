@@ -1,0 +1,158 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: f898aa44809a4d6a98a313d1fd1771e4
+      name: 'NEOS Templates'
+  templates:
+    - uuid: fc7f5f9a1568499b83bc6274892c864b
+      template: 'Template MegaRAID Array'
+      name: 'Template MegaRAID Array'
+      groups:
+        - name: 'NEOS Templates'
+      discovery_rules:
+        - uuid: 3c1844a7601d464caa5d8d7de9f5e3bc
+          name: 'Megacli: Adapters discovery'
+          key: megacli.adp.discovery
+          delay: 1h
+          filter:
+            conditions:
+              - macro: '{#ADPNUM}'
+                operator: EXISTS
+                formulaid: A
+          item_prototypes:
+            - uuid: a1c941a40d92451c8a06ca20a87371fc
+              name: 'Megacli: Adapter {#ADPNUM} name'
+              key: 'megacli.adp.name[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+            - uuid: 7fabdc22e2514e93a4eafc38cecad996
+              name: 'Megacli: Adapter {#ADPNUM} logical drives degraded'
+              key: 'megacli.ld.degraded[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                - uuid: 05581cb7668d4af9af9a549d9bc16ce7
+                  expression: 'last(/Template MegaRAID Array/megacli.ld.degraded[{#ADPNUM}])>0'
+                  name: 'Megacli: degraded logical drive on {HOSTNAME}'
+                  priority: HIGH
+            - uuid: 9a30044e0d2f43cbb216b3d3473787f2
+              name: 'Megacli: Adapter {#ADPNUM} logical drives offline'
+              key: 'megacli.ld.offline[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                - uuid: 6d77d356fbcc403d8bb318dd048eee09
+                  expression: 'last(/Template MegaRAID Array/megacli.ld.offline[{#ADPNUM}])>0'
+                  name: 'Megacli: offline logical drive on {HOSTNAME}'
+                  priority: HIGH
+            - uuid: 3827e88eac824777ad42fa754272ab00
+              name: 'Megacli: Adapter {#ADPNUM} memory correctable errors'
+              key: 'megacli.mem.err[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                - uuid: b2c1b5700bed44f3879f4febdae7aadc
+                  expression: 'change(/Template MegaRAID Array/megacli.mem.err[{#ADPNUM}])>0'
+                  name: 'Megacli: memory correctable errors on adapter {#ADPNUM} at {HOSTNAME}'
+                  priority: HIGH
+            - uuid: 6c261c1620044ebe889d21d6d77c5903
+              name: 'Megacli: Adapter {#ADPNUM} memory uncorrectable errors'
+              key: 'megacli.mem.unerr[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                - uuid: 54080aa95c954f6abdda317d16c28079
+                  expression: 'change(/Template MegaRAID Array/megacli.mem.unerr[{#ADPNUM}])>0'
+                  name: 'Megacli: memory uncorrectable errors on adapter {#ADPNUM} at {HOSTNAME}'
+                  priority: HIGH
+            - uuid: 1088258a9be04be8a34cce1e689a9727
+              name: 'Megacli: Adapter {#ADPNUM} physical drives with critical state'
+              key: 'megacli.pd.critical[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                - uuid: 301590ab8e0341b09e91a82b7a3b35cf
+                  expression: 'last(/Template MegaRAID Array/megacli.pd.critical[{#ADPNUM}])>0'
+                  name: 'Megacli: physical drive in crytical state on {HOSTNAME}'
+                  priority: HIGH
+            - uuid: bbecd379f981415990880237f0db0c95
+              name: 'Megacli: Adapter {#ADPNUM} physical drives with failed state'
+              key: 'megacli.pd.failed[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                - uuid: ff0b33c69344452faabeb2c735bb62e0
+                  expression: 'last(/Template MegaRAID Array/megacli.pd.failed[{#ADPNUM}])>0'
+                  name: 'Megacli: physical drive in failed state on {HOSTNAME}'
+                  priority: HIGH
+            - uuid: 86043b01396a402585fda0f4a231f7fb
+              name: 'Megacli: Adapter {#ADPNUM} physical drives total'
+              key: 'megacli.pd.total[{#ADPNUM}]'
+              trends: '0'
+              value_type: TEXT
+        - uuid: f53e2cbdada7488e94f4364e0bf03f4c
+          name: 'Megacli: Logical drives discovery'
+          key: megacli.ld.discovery
+          delay: 1h
+          filter:
+            conditions:
+              - macro: '{#LD}'
+                operator: EXISTS
+                formulaid: A
+          item_prototypes:
+            - uuid: 55d929da53ee4f9cb62bc9819268787d
+              name: 'Megacli: Logical volume {#CONTROLLER}:{#LD} status'
+              key: 'megacli.ld.state[{#CONTROLLER},{#LD}]'
+              trends: '0'
+              value_type: TEXT
+              tags:
+                - tag: Megacli
+              trigger_prototypes:
+                - uuid: e2203c4ee3c748c3a0614ac420595f94
+                  expression: 'find(/Template MegaRAID Array/megacli.ld.state[{#CONTROLLER},{#LD}],,"like","Optimal")=0'
+                  name: 'Megacli: logical volume state is {ITEM.LASTVALUE} on {#LD} controller'
+                  priority: HIGH
+        - uuid: bf6c5b71fcd3422ab86f062cade6e3dc
+          name: 'Megacli: Physical drives discovery'
+          key: megacli.pd.discovery
+          delay: 1h
+          filter:
+            conditions:
+              - macro: '{#BAY}'
+                formulaid: A
+          item_prototypes:
+            - uuid: 9f1c7872a5804dd3a0b25dfff180f0f3
+              name: 'Megacli: Physical drive {#CONTROLLER}:{#BAY}:{#PD} media errors'
+              key: 'megacli.pd.media_error[{#CONTROLLER},{#BAY},{#PD}]'
+              tags:
+                - tag: Megacli
+            - uuid: 1b0b240582e54bceb0ee5451753a02ff
+              name: 'Megacli: Physical drive {#CONTROLLER}:{#BAY}:{#PD} other errors'
+              key: 'megacli.pd.other_error[{#CONTROLLER},{#BAY},{#PD}]'
+              tags:
+                - tag: Megacli
+            - uuid: 81bcd2387ae34d74a4a235e03a7052ba
+              name: 'Megacli: Physical drive {#CONTROLLER}:{#BAY}:{#PD} predictive failure'
+              key: 'megacli.pd.pred_failure[{#CONTROLLER},{#BAY},{#PD}]'
+              trends: '0'
+              tags:
+                - tag: Megacli
+            - uuid: 9a076a1950854df4b2698edd7373c2dd
+              name: 'Megacli: Physical drive {#CONTROLLER}:{#BAY}:{#PD} state'
+              key: 'megacli.pd.state[{#CONTROLLER},{#BAY},{#PD}]'
+              trends: '0'
+              value_type: TEXT
+              tags:
+                - tag: Megacli
+              trigger_prototypes:
+                - uuid: 4b681a4f48ea4001beb31cd5b6e81ec7
+                  expression: 'find(/Template MegaRAID Array/megacli.pd.state[{#CONTROLLER},{#BAY},{#PD}],,"like","Online")=0'
+                  name: 'Megacli: disk state is {ITEM.LASTVALUE} on {#PD}'
+                  priority: HIGH
+            - uuid: 3779917483744771917bc6357338cfb0
+              name: 'Megacli: Physical drive {#CONTROLLER}:{#BAY}:{#PD} temperature'
+              key: 'megacli.pd.temperature[{#CONTROLLER},{#BAY},{#PD}]'
+              trends: '0'
+              value_type: FLOAT
+              tags:
+                - tag: Megacli

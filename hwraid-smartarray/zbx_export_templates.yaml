@@ -1,0 +1,161 @@
+zabbix_export:
+  version: '6.2'
+  date: '2024-05-22T09:18:53Z'
+  template_groups:
+    -
+      uuid: f898aa44809a4d6a98a313d1fd1771e4
+      name: 'My Templates'
+  templates:
+    -
+      uuid: 669bd40e09314610ae17133582f376c5
+      template: 'Template HP Smart Array'
+      name: 'Template HP Smart Array'
+      groups:
+        -
+          name: 'My Templates'
+      discovery_rules:
+        -
+          uuid: 3e3190cf7ff445cd94aac3897607a23a
+          name: 'Controllers discovery'
+          key: hpraid.ctrl.discovery
+          item_prototypes:
+            -
+              uuid: 7a033af369784a74aa0a6f1823775ded
+              name: 'Smart Array: Battery status on slot {#CTRL_SLOT}'
+              key: 'hpraid.bbu.status[{#CTRL_SLOT}]'
+              delay: 1d
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                -
+                  uuid: 6bb91cde130c4fa6a15a69fe16a928ed
+                  expression: 'find(/Template HP Smart Array/hpraid.bbu.status[{#CTRL_SLOT}],,"regexp","OK|Not available")=0'
+                  name: 'Smart Array: Controller bbu in slot {#CTRL_SLOT} state is {ITEM.LASTVALUE}'
+                  priority: HIGH
+            -
+              uuid: af0109a481b547c6858cc6f45ec5ac7b
+              name: 'Smart Array: Cache status on slot {#CTRL_SLOT}'
+              key: 'hpraid.cache.status[{#CTRL_SLOT}]'
+              delay: 1d
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                -
+                  uuid: e99c7ce0e09a433c9db535c4e073f385
+                  expression: 'find(/Template HP Smart Array/hpraid.cache.status[{#CTRL_SLOT}],,"regexp","OK|Not available")=0'
+                  name: 'Smart Array: Cache controller in slot {#CTRL_SLOT} state is {ITEM.LASTVALUE}'
+                  priority: HIGH
+            -
+              uuid: c5227de3eeb8448091b2ef1667b1693e
+              name: 'Smart Array: Controller status on slot {#CTRL_SLOT}'
+              key: 'hpraid.ctrl.status[{#CTRL_SLOT}]'
+              delay: 1d
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                -
+                  uuid: 2747395c45cd4eb7aac93ddbc071bd95
+                  expression: 'nodata(/Template HP Smart Array/hpraid.ctrl.status[{#CTRL_SLOT}],24h)=1'
+                  name: 'Smart Array: No controller data received for >24h'
+                  priority: DISASTER
+                -
+                  uuid: f7bdced8f1b14157823ee763b1f7b692
+                  expression: 'find(/Template HP Smart Array/hpraid.ctrl.status[{#CTRL_SLOT}],,"regexp","OK")=0'
+                  name: 'Smart Array: Сontroller in slot {#CTRL_SLOT} state is {ITEM.LASTVALUE}'
+                  priority: HIGH
+        -
+          uuid: f62229c081354969bd6feece56a82efb
+          name: 'Logical volumes discovery'
+          key: hpraid.ld.discovery
+          filter:
+            conditions:
+              -
+                macro: '{#LD}'
+                operator: EXISTS
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 915b3c3f134e4714912081859c395a60
+              name: 'Logical volumes {#CONTROLLER} {#LD} disk name'
+              key: 'hpraid.ld.disk.name[{#CONTROLLER} {#LD}]'
+              delay: 1d
+              trends: '0'
+              value_type: TEXT
+            -
+              uuid: 433d5d4c4dbe4fdc80587ebc91c18f24
+              name: 'Logical volumes {#CONTROLLER} {#LD} size'
+              key: 'hpraid.ld.size[{#CONTROLLER} {#LD}]'
+              delay: 1d
+              trends: '0'
+              value_type: TEXT
+            -
+              uuid: e0cf23a7efc24f55a0a41a11106189e5
+              name: 'Logical volumes {#CONTROLLER} {#LD} status'
+              key: 'hpraid.ld.status[{#CONTROLLER} {#LD}]'
+              delay: 3h
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                -
+                  uuid: d9558955038e42dd833d756e6b5ad0ef
+                  expression: 'find(/Template HP Smart Array/hpraid.ld.status[{#CONTROLLER} {#LD}],,"like","OK")=0'
+                  name: 'Smart Array: logical volume state is {ITEM.LASTVALUE} on {#LD}'
+                  priority: HIGH
+        -
+          uuid: ad690ba85ae44430811f5592a4b41e85
+          name: 'Physical drives discovery'
+          key: hpraid.pd.discovery
+          filter:
+            conditions:
+              -
+                macro: '{#PD}'
+                operator: EXISTS
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 72894e2a44b14c4ab082b556f13443a7
+              name: 'Physical drive {#CONTROLLER} {#PD} block size'
+              key: 'hpraid.pd.block.size[{#CONTROLLER} {#PD}]'
+              delay: 5h
+              trends: '0'
+              value_type: TEXT
+            -
+              uuid: ebbf6b0167034a7fb512faa49a7c895a
+              name: 'Physical drive {#CONTROLLER} {#PD} model'
+              key: 'hpraid.pd.model[{#CONTROLLER} {#PD}]'
+              delay: 5h
+              trends: '0'
+              value_type: TEXT
+            -
+              uuid: d254df8b887749a38d0d39c4936dbf0a
+              name: 'Physical drive {#CONTROLLER} {#PD} serial number'
+              key: 'hpraid.pd.serial.number[{#CONTROLLER} {#PD}]'
+              delay: 5h
+              trends: '0'
+              value_type: TEXT
+            -
+              uuid: df5a87b08dc14e58b778b34a07ffce50
+              name: 'Physical drive {#CONTROLLER} {#PD} size'
+              key: 'hpraid.pd.size[{#CONTROLLER} {#PD}]'
+              delay: 5h
+              trends: '0'
+              value_type: TEXT
+            -
+              uuid: 21e59b2b3fa345e596e0f970c9f40814
+              name: 'Physical drive {#CONTROLLER} {#PD} status'
+              key: 'hpraid.pd.status[{#CONTROLLER} {#PD}]'
+              delay: 3h
+              trends: '0'
+              value_type: TEXT
+              trigger_prototypes:
+                -
+                  uuid: 30ef786c1d484e96a575fd9c46a20762
+                  expression: 'find(/Template HP Smart Array/hpraid.pd.status[{#CONTROLLER} {#PD}],,"like","OK")=0'
+                  name: 'Smart Array: disk state is {ITEM.LASTVALUE} on {#PD}'
+                  priority: HIGH
+            -
+              uuid: 5d3dd750af7b4f43aa7d00c5828edcee
+              name: 'Physical drive {#CONTROLLER} {#PD} temperature'
+              key: 'hpraid.pd.temperature[{#CONTROLLER} {#PD}]'
+              delay: 3h
+              value_type: FLOAT

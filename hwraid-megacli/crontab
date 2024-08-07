@@ -1,0 +1,4 @@
+# Description: MegaRAID data gathering and analyze 
+0 6 * * * /usr/libexec/zabbix-extensions/scripts/megacli-raid-data-processor.sh
+
+ln -s /opt/MegaRAID/MegaCli/MegaCli64 /usr/bin/megacli
